@@ -218,3 +218,7 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Datos crudos descargados (se regeneran con los scripts)
+data/raw/
+data/interim/
