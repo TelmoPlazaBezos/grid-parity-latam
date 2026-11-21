@@ -5,8 +5,8 @@ automatizadas. Se reconstruye a partir del CMO semihorario del ONS (el PLD
 horario sale del mismo modelo DESSEM), acotado por el PLD mínimo y máximo
 horario regulados por ANEEL para cada año.
 
-Límites del PLD (ANEEL): 2023-2026 verificados en prensa sectorial
-(Canal Solar, Cenário Energia). 2022 pendiente de verificar.
+Límites del PLD (ANEEL) 2022-2026 verificados (CCEE, FGV Energia, Canal Solar,
+Cenário Energia).
 
 Tipo de cambio: PTAX (venta) del Banco Central do Brasil, API abierta Olinda.
 """
@@ -27,7 +27,7 @@ RAW_DIR = ROOT / "data" / "raw" / "brasil"
 
 # PLD mínimo y máximo horario (R$/MWh) por año, fijados por ANEEL.
 PLD_LIMITES = {
-    2022: (55.70, 1326.50),  # pendiente de verificar
+    2022: (55.70, 1314.02),
     2023: (69.04, 1391.56),
     2024: (61.07, 1470.47),
     2025: (58.60, 1542.23),

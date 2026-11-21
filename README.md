@@ -63,7 +63,7 @@ frente al 20,7 % de S&P Global; Chile 2024: 5.642 GWh, igual que Ember).
 
 ## Limitaciones
 
-- El LCOE es la media mundial de IRENA, no el de cada país (2022 y eólica 2025 pendientes de verificar).
+- El LCOE es la media mundial ponderada de IRENA, no el de cada país.
 - Solar en Brasil: solo hay datos desde abril de 2024, así que no se puede validar fuera de muestra.
 - Chile: precio en una barra representativa por tecnología (Crucero para solar, Charrúa para eólica).
 - El modelo es univariante: no incluye hidrología, nueva transmisión ni baterías.
