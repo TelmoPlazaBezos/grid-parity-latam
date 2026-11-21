@@ -3,7 +3,7 @@
 import pandas as pd
 import plotly.graph_objects as go
 
-from src.config import COLORES
+from src.config import COLORES, COLORES_CASO, PAISES, TECNOLOGIAS
 
 LAYOUT_BASE = dict(
     template="plotly_white",
@@ -86,4 +86,23 @@ def fig_vertimiento(df: pd.DataFrame, fc: pd.DataFrame) -> go.Figure:
     fig.update_layout(**LAYOUT_BASE, yaxis_title="% de la energía disponible", showlegend=False,
                       barmode="overlay")
     fig.update_layout(title_text="Tasa de vertimiento")
+    return fig
+
+
+def fig_panorama(anual: pd.DataFrame) -> go.Figure:
+    """Margen de paridad anual de los 4 casos (2026: real parcial)."""
+    fig = go.Figure()
+    for (pais, tec), color in COLORES_CASO.items():
+        a = anual[(anual["pais"] == pais) & (anual["tecnologia"] == tec)].sort_values("anio")
+        etiquetas = [f"{x}*" if x == 2026 else str(x) for x in a["anio"]]
+        fig.add_trace(go.Bar(
+            x=etiquetas, y=a["margen"], name=f"{TECNOLOGIAS[tec]} · {PAISES[pais]}",
+            marker_color=color, customdata=a["meses"],
+            hovertemplate="%{y:+.1f} USD/MWh (%{customdata} meses)<extra>%{fullData.name}</extra>",
+        ))
+    fig.add_hline(y=0, line_width=1.5, line_color="#1c2733")
+    fig.update_layout(**{**LAYOUT_BASE, "hovermode": "closest"}, barmode="group",
+                      yaxis_title="Margen de paridad (USD/MWh)",
+                      xaxis=dict(type="category", categoryorder="category ascending"))
+    fig.update_layout(title_text="Margen de paridad por año: por encima de 0, el mercado paga el coste real")
     return fig

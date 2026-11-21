@@ -18,3 +18,11 @@ COLORES = {
     "margen_neg": "rgba(192, 80, 77, 0.30)",
     "vertimiento": "#7f8c8d",
 }
+
+# Un color por caso en la vista comparativa: eólica en azules, solar en naranjas.
+COLORES_CASO = {
+    ("CL", "eolica"): "#1f4e79",
+    ("BR", "eolica"): "#7fa7cf",
+    ("CL", "solar"): "#c55a11",
+    ("BR", "solar"): "#f4b183",
+}
