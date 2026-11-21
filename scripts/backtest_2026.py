@@ -28,6 +28,7 @@ def brasil_2026(hasta: str = "2026-10") -> pd.DataFrame:
             "fecha": g.index, "pais": "BR", "tecnologia": tec,
             "precio_capturado": (g["ingreso"] / g["generacion"]).values,
             "vertimiento": (g["vertido"] / (g["vertido"] + g["generacion"])).values,
+            "generacion_mwh": g["generacion"].values,
         }))
     return pd.concat(filas, ignore_index=True)
 
@@ -40,7 +41,7 @@ def chile_2026(hasta: str = "2026-04") -> pd.DataFrame:
     """
     c = chile.mensual("2026-01", hasta)
     return c.dropna(subset=["precio_capturado", "vertimiento"])[
-        ["fecha", "pais", "tecnologia", "precio_capturado", "vertimiento"]]
+        ["fecha", "pais", "tecnologia", "precio_capturado", "vertimiento", "generacion_mwh"]]
 
 
 def main() -> None:

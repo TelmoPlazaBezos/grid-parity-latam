@@ -16,7 +16,7 @@ from src.indicators import add_indicadores
 
 COLUMNAS = [
     "fecha", "pais", "tecnologia", "precio_base", "precio_capturado",
-    "vertimiento", "lcoe", "fuente",
+    "vertimiento", "generacion_mwh", "lcoe", "fuente",
 ]
 
 
@@ -38,7 +38,8 @@ def build_demo_dataset(seed: int = 42) -> pd.DataFrame:
             filas.append(pd.DataFrame({
                 "fecha": fechas, "pais": pais, "tecnologia": tec,
                 "precio_base": base.round(2), "precio_capturado": capturado.round(2),
-                "vertimiento": vert.round(4), "lcoe": lcoe, "fuente": "demo",
+                "vertimiento": vert.round(4), "generacion_mwh": 1e6, "lcoe": lcoe,
+                "fuente": "demo",
             }))
     return pd.concat(filas, ignore_index=True)[COLUMNAS]
 
