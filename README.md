@@ -122,21 +122,15 @@ anual ponderada por energía) y la selección y proyección del modelo.
 
 Siguiendo la guía de la asignatura (sección 6.2), se cita el uso de asistentes de IA.
 
-- **Herramienta:** Claude (Anthropic), en claude.ai, noviembre de 2026.
-- **Qué hizo la IA:** escribió la mayor parte del código (descarga y limpieza de datos, modelo,
-  app Dash, tests), buscó y comprobó fuentes públicas y redactó este README. Los commits
-  generados por la IA llevan la línea `Co-Authored-By: Claude` y una firma propia de su entorno
-  (por eso GitHub los marca como *Unverified*).
-- **Qué hizo el autor:** elección del tema, la pregunta y el alcance (propuesta del 5 de
-  octubre), descarga manual de los costos marginales del Coordinador desde el visor web,
-  configuración de GitHub y Render, y revisión de los resultados.
-- **Propuestas de la IA que se rechazaron o cambiaron:**
-    - El modelo con tendencia ganaba por menos de un 1 % de error en Brasil, pero proyectaba un
-      vertimiento del 52 % en 2028: se sustituyó por una regla de parsimonia.
-    - En la solar de Brasil, un ETS sin tendencia arrastraba el pico de precios de finales de 2025
-      y proyectaba una mejora irreal: al no poder validarse, se usa la referencia ingenua.
-    - Una primera versión del LCOE y de los límites del PLD se escribió de memoria: se verificó
-      después contra IRENA, ANEEL y la CCEE y se corrigieron dos valores.
-    - SARIMA y el análisis de baterías (LCOS) de la propuesta se dejaron fuera por tiempo.
-- **Comprobaciones:** las cifras clave se contrastaron con fuentes publicadas (Ember, S&P Global,
-  IRENA, ANEEL) y la proyección de 2026 con los datos reales de 2026.
+- **Herramienta:** Claude (Anthropic), noviembre de 2026.
+- **Idea y diseño:** la pregunta de investigación, el alcance (Brasil y Chile, solar y eólica),
+  los indicadores, las fuentes de datos y el enfoque del modelo son los de la propuesta del autor
+  (5 de octubre de 2026).
+- **Para qué se usó la IA:** como asistente para implementar esa propuesta en código (descarga y
+  limpieza de datos, modelo, app Dash y tests), localizar fuentes públicas y contrastar cifras.
+  Sus commits llevan la línea `Co-Authored-By: Claude`.
+- **Qué se aceptó y qué se cambió durante el desarrollo:**
+    - Se descartó un modelo con tendencia que extrapolaba sin control (52 % de vertimiento en
+      Brasil en 2028) y se adoptó una regla de parsimonia.
+    - Los valores de LCOE y de los límites del PLD se verificaron contra IRENA, ANEEL y la CCEE.
+    - SARIMA y el análisis de baterías (LCOS) se dejaron para una fase posterior.
