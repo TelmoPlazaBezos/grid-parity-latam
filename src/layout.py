@@ -49,6 +49,6 @@ def build_layout() -> html.Div:
         html.Div(id="tabla-previsiones"),
         html.Footer(className="footer", children=[
             "Fuentes: CCEE, ONS, Banco Central do Brasil, Coordinador Eléctrico "
-            "Nacional, IRENA (LCOE provisional: media mundial). Telmo Plaza Bezos · DAVD 2026-27.",
+            "Nacional, IRENA (LCOE: media mundial ponderada). Telmo Plaza Bezos · DAVD 2026-27.",
         ]),
     ])
