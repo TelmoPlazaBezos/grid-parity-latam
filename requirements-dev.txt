@@ -1,1 +1,2 @@
 statsmodels>=0.14  # solo para scripts/build_forecast.py (la app no lo necesita)
+pytest>=8
