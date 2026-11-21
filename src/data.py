@@ -11,7 +11,7 @@ misma estructura, marcados con `fuente = "demo"`. No son datos reales.
 import numpy as np
 import pandas as pd
 
-from src.config import MONTHLY_FILE, PAISES, TECNOLOGIAS
+from src.config import DATA_PROCESSED, MONTHLY_FILE, PAISES, TECNOLOGIAS
 from src.indicators import add_indicadores
 
 COLUMNAS = [
@@ -50,6 +50,18 @@ def load_monthly() -> pd.DataFrame:
     else:
         df = build_demo_dataset()
     return add_indicadores(df)
+
+
+def load_forecast() -> pd.DataFrame:
+    """Proyecciones precalculadas (vacío si aún no existen)."""
+    ruta = DATA_PROCESSED / "forecast.csv"
+    return pd.read_csv(ruta, parse_dates=["fecha"]) if ruta.exists() else pd.DataFrame()
+
+
+def load_validacion() -> pd.DataFrame:
+    """Métricas de validación 2025 por serie (vacío si aún no existen)."""
+    ruta = DATA_PROCESSED / "validacion.csv"
+    return pd.read_csv(ruta) if ruta.exists() else pd.DataFrame()
 
 
 if __name__ == "__main__":

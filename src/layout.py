@@ -39,8 +39,10 @@ def build_layout() -> html.Div:
             kpi("kpi-vert", "Vertimiento último año"),
             kpi("kpi-captura", "Ratio de captura"),
             kpi("kpi-paridad", "¿Paridad de red?"),
+            kpi("kpi-proyeccion", "Margen proyectado 2028 (USD/MWh)"),
         ]),
         dcc.Graph(id="g-paridad", config={"displayModeBar": False}),
+        html.P(id="nota-modelo", className="nota"),
         dcc.Graph(id="g-vertimiento", config={"displayModeBar": False}),
         html.Footer(className="footer", children=[
             "Fuentes: CCEE, ONS, Banco Central do Brasil, Coordinador Eléctrico "
