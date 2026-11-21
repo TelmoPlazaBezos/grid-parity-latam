@@ -1,80 +1,109 @@
 # Grid Parity LatAm
 
-Paridad de red en Brasil y Chile: LCOE efectivo frente a precio capturado.
+**¿Siguen siendo rentables la solar y la eólica en Brasil y Chile cuando se descuenta la energía vertida?**
+
+App: **https://grid-parity-latam.onrender.com**
 
 Proyecto de la asignatura Desarrollo de Aplicaciones para la Visualización de Datos
 (ICAI, curso 2026-2027). Autor: Telmo Plaza Bezos.
 
-## Descripción
+## La idea
 
-En Brasil y Chile una parte creciente de la energía solar y eólica se vierte por falta
-de red, y la que se vende lo hace en las horas de precio más bajo. Comparar el LCOE con
-el precio medio del mercado ya no sirve para saber si una planta es rentable.
+Comparar el LCOE de una planta con el precio medio del mercado ya no sirve para saber si
+es rentable. En Brasil y Chile una parte creciente de la energía solar y eólica se vierte
+por falta de red, y la que se vende lo hace en las horas de precio más bajo.
 
-Este proyecto calcula el coste real de cada tecnología, ajustado por la energía vertida,
-y lo compara con el precio que de verdad captura en el mercado. Todo con datos públicos.
+La app calcula, por país, tecnología y mes:
 
-## Objetivos
+| Indicador | Definición |
+|---|---|
+| Precio capturado (USD/MWh) | Media del precio horario ponderada por la generación de la tecnología |
+| Ratio de captura | Precio capturado / precio medio del mes |
+| Tasa de vertimiento *v* | Energía vertida / (generada + vertida) |
+| LCOE efectivo (USD/MWh) | LCOE / (1 − *v*): coste por MWh realmente vendido |
+| Margen de paridad (USD/MWh) | Precio capturado − LCOE efectivo (> 0: hay paridad) |
 
-1. Calcular cinco indicadores por mes, país y tecnología (solar fotovoltaica y eólica
-   terrestre): precio capturado, ratio de captura, tasa de vertimiento, LCOE efectivo
-   y margen.
-2. Proyectar a tres años el precio capturado, el vertimiento y el LCOE, con bandas de
-   confianza, y estimar en qué año cambia de signo el margen.
-3. Publicar un dashboard interactivo en Dash, desplegado en Render.
+y los proyecta a 2026-2028, contrastando la proyección con los datos reales de 2026 y con
+previsiones públicas de terceros (Aurora, ONS, Coordinador, Wood Mackenzie).
 
-## Datos
+## Resultados principales (2022-2025)
+
+- **Eólica en Chile**: la única con paridad a precio de mercado todos los años, aunque el
+  margen cae de +64 USD/MWh (2022) a +9 (2024) y +21 (2025).
+- **Solar en Chile**: en el norte (Crucero 220 kV) captura entre el 14 % y el 33 % del precio
+  medio, porque a mediodía el costo marginal cae a cero. Margen de −43 USD/MWh en 2025.
+- **Brasil**: sin paridad a precio spot en ningún año (eólica −7 y solar −30 USD/MWh en 2025).
+  El PLD estuvo casi siempre en el suelo en 2022-2023 y el vertimiento solar llegó al 25 % en 2025.
+
+## Datos (todos públicos)
 
 | Dato | Brasil | Chile |
 |---|---|---|
-| Precio horario | CCEE (PLD por submercado) | Coordinador Eléctrico Nacional (costo marginal real) |
-| Generación y vertimiento | ONS | Coordinador Eléctrico Nacional / ACERA |
-| LCOE | IRENA | IRENA |
-| Tipo de cambio | Banco Central do Brasil (PTAX) | No aplica (USD) |
+| Precio horario | CMO semihorario del ONS acotado a los límites del PLD (ANEEL) | Costo marginal real del Coordinador Eléctrico Nacional (API hasta jul-2024; después, descarga del visor) |
+| Generación y vertimiento | ONS, constrained-off por central (eólica desde 2021, solar desde abr-2024) | Generación horaria por tecnología (API del Coordinador) y reducciones ERV mensuales (Excel oficial) |
+| Tipo de cambio | PTAX, Banco Central do Brasil | No aplica (USD) |
+| LCOE | IRENA, media mundial ponderada | IRENA, media mundial ponderada |
 
-Los datos de CCEE y ONS se publican con licencia CC BY 4.0.
+Por qué el CMO del ONS y no el PLD de la CCEE: el portal de la CCEE bloquea descargas
+automatizadas. El PLD horario sale del mismo modelo (DESSEM) y se reconstruye acotando el
+CMO entre el PLD mínimo y máximo de cada año.
 
-## Plan de trabajo
+Validaciones: el vertimiento calculado cuadra con las cifras publicadas (Brasil 2025 ≈ 20 %
+frente al 20,7 % de S&P Global; Chile 2024: 5.642 GWh, igual que Ember).
 
-| Fase | Fechas | Entregable |
-|---|---|---|
-| 1. Datos | 6 – 25 oct 2026 | Descarga, limpieza e indicadores históricos 2022-2025 |
-| 2. Modelo | 26 oct – 8 nov | Proyección a 3 años, validada con 2025 |
-| 3. Dashboard | 9 – 19 nov | Aplicación en Dash |
-| 4. Despliegue | 20 – 25 nov | Publicación en Render y README final |
+## Modelo
 
-## Estado
+- Para cada serie (país × tecnología × variable) se comparan tres candidatos: estacional
+  ingenuo, ETS sin tendencia y ETS con tendencia amortiguada.
+- Entrenamiento 2022-2024, validación fuera de muestra en 2025 (MAE).
+- Se elige el modelo más simple cuyo MAE no supere en más de un 5 % al mejor (parsimonia).
+- Proyección a 36 meses con intervalo del 80 %. LCOE con tendencia log-lineal.
+- Contraste con lo real de 2026 (Brasil, ene-oct): el vertimiento se proyecta bien; el
+  precio acierta la media pero no el perfil mensual, que depende de la hidrología.
 
-Propuesta presentada el 5 de octubre de 2026. Desarrollo en curso.
+## Limitaciones
 
-> **Nota:** este README recoge la propuesta tal y como está a 4 de octubre de 2026. Es un
-> punto de partida, no un plan cerrado. A lo largo del cuatrimestre pueden surgir
-> contratiempos con los datos o ideas nuevas que cambien el alcance, la metodología o el
-> calendario. Cualquier cambio quedará reflejado aquí.
+- El LCOE es la media mundial de IRENA, no el de cada país (2022 y eólica 2025 pendientes de verificar).
+- Solar en Brasil: solo hay datos desde abril de 2024, así que no se puede validar fuera de muestra.
+- Chile: precio en una barra representativa por tecnología (Crucero para solar, Charrúa para eólica).
+- El modelo es univariante: no incluye hidrología, nueva transmisión ni baterías.
 
 ## Estructura del código
 
 ```
-app.py              punto de entrada (local y Render)
-src/config.py       rutas, países, tecnologías y colores
-src/data.py         carga del dataset mensual (y, más adelante, descarga de fuentes)
-src/indicators.py   ratio de captura, LCOE efectivo y margen de paridad
-src/figures.py      gráficos Plotly
-src/layout.py       estructura de la página
-src/callbacks.py    interactividad
-assets/style.css    estilos
-data/processed/     dataset mensual consolidado que lee la app
+app.py                  punto de entrada (local y Render)
+src/config.py           rutas, países, tecnologías y colores
+src/data.py             carga de los CSV procesados
+src/indicators.py       ratio de captura, LCOE efectivo y margen
+src/lcoe.py             LCOE anual de IRENA
+src/model.py            selección de modelo, validación y proyección
+src/figures.py          gráficos Plotly
+src/layout.py           estructura de la página
+src/callbacks.py        interactividad
+src/sources/            descarga y limpieza por fuente (ons, brasil_precio, brasil, chile)
+scripts/                construcción del dataset, del modelo y del contraste 2026
+data/processed/         CSV que lee la app
+data/external/          archivos descargados a mano y previsiones de terceros
+assets/style.css        estilos
 ```
 
-## Cómo ejecutar en local
+## Cómo ejecutar
 
 ```bash
 python -m venv .venv
-source .venv/bin/activate      # Windows: .venv\Scripts\activate
+source .venv/bin/activate          # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-python app.py                  # http://127.0.0.1:8050
+python app.py                      # http://127.0.0.1:8050
 ```
 
-> Ahora mismo la app usa **datos de prueba sintéticos** (`fuente = demo`) para validar
-> la estructura y el despliegue. Se sustituirán por los datos reales de CCEE, ONS y el
-> Coordinador.
+Regenerar datos y modelo (descarga de las fuentes, unos minutos):
+
+```bash
+pip install -r requirements-dev.txt
+python -m scripts.build_dataset
+python -m scripts.build_forecast
+python -m scripts.backtest_2026
+```
+
+La app desplegada solo lee `data/processed/`, así que arranca rápido y no depende de que las
+fuentes estén disponibles.
