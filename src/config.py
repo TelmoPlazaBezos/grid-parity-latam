@@ -7,7 +7,7 @@ DATA_PROCESSED = ROOT / "data" / "processed"
 MONTHLY_FILE = DATA_PROCESSED / "monthly.csv"
 
 PAISES = {"BR": "Brasil", "CL": "Chile"}
-TECNOLOGIAS = {"solar": "Solar FV", "eolica": "Eólica terrestre"}
+TECNOLOGIAS = {"solar": "Solar PV", "eolica": "ONW"}
 
 # Paleta: un color por serie, iguales en todos los gráficos.
 COLORES = {

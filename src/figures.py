@@ -7,8 +7,8 @@ from src.config import COLORES, COLORES_CASO, PAISES, TECNOLOGIAS
 
 LAYOUT_BASE = dict(
     template="plotly_white",
-    margin=dict(l=55, r=20, t=70, b=40),
-    legend=dict(orientation="h", y=1.02, yanchor="bottom", x=0),
+    margin=dict(l=55, r=20, t=50, b=70),
+    legend=dict(orientation="h", y=-0.12, yanchor="top", x=0),
     hovermode="x unified",
     font=dict(family="Inter, Segoe UI, sans-serif", size=13),
     title=dict(x=0, y=0.97, yanchor="top", font=dict(size=15)),
