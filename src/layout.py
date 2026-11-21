@@ -44,6 +44,9 @@ def build_layout() -> html.Div:
         dcc.Graph(id="g-paridad", config={"displayModeBar": False}),
         html.P(id="nota-modelo", className="nota"),
         dcc.Graph(id="g-vertimiento", config={"displayModeBar": False}),
+        html.H3("Segunda opinión: ¿qué dicen otros?", className="seccion"),
+        html.P(id="contraste-2026", className="nota"),
+        html.Div(id="tabla-previsiones"),
         html.Footer(className="footer", children=[
             "Fuentes: CCEE, ONS, Banco Central do Brasil, Coordinador Eléctrico "
             "Nacional, IRENA (LCOE provisional: media mundial). Telmo Plaza Bezos · DAVD 2026-27.",

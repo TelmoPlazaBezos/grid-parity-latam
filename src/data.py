@@ -64,6 +64,18 @@ def load_validacion() -> pd.DataFrame:
     return pd.read_csv(ruta) if ruta.exists() else pd.DataFrame()
 
 
+def load_previsiones() -> pd.DataFrame:
+    """Previsiones públicas de terceros (segunda opinión), recopiladas a mano."""
+    ruta = DATA_PROCESSED.parent / "external" / "previsiones_externas.csv"
+    return pd.read_csv(ruta) if ruta.exists() else pd.DataFrame()
+
+
+def load_real_2026() -> pd.DataFrame:
+    """Meses de 2026 con dato real, para contrastar con la proyección."""
+    ruta = DATA_PROCESSED / "real_2026.csv"
+    return pd.read_csv(ruta, parse_dates=["fecha"]) if ruta.exists() else pd.DataFrame()
+
+
 if __name__ == "__main__":
     MONTHLY_FILE.parent.mkdir(parents=True, exist_ok=True)
     build_demo_dataset().to_csv(MONTHLY_FILE, index=False)

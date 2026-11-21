@@ -44,7 +44,36 @@ def _nota_modelo(val: pd.DataFrame, pais: str, tecnologia: str) -> str:
                    f"{v['mae']:.1f} USD/MWh (referencia ingenua: {v['mae_ingenuo']:.1f}).")
 
 
-def register_callbacks(app: Dash, df: pd.DataFrame, fc: pd.DataFrame, val: pd.DataFrame) -> None:
+def _tabla_previsiones(prev: pd.DataFrame, pais: str) -> Optional[html.Table]:
+    """Tabla de previsiones públicas de terceros para el país elegido."""
+    if prev.empty:
+        return None
+    p = prev[prev["pais"] == pais]
+    cabecera = html.Tr([html.Th(c) for c in ["Fuente", "Fecha", "Qué dice", "Frente al modelo"]])
+    filas = [html.Tr([
+        html.Td(html.A(r["fuente"], href=r["url"], target="_blank")),
+        html.Td(r["fecha"]), html.Td(r["que_dice"]), html.Td(r["frente_al_modelo"]),
+    ]) for _, r in p.iterrows()]
+    return html.Table([html.Thead(cabecera), html.Tbody(filas)], className="tabla")
+
+
+def _contraste_2026(real26: pd.DataFrame, fc: pd.DataFrame, pais: str, tecnologia: str) -> str:
+    """Compara la proyección de 2026 con los meses de 2026 ya publicados."""
+    r = _filtrar(real26, pais, tecnologia)
+    if r.empty:
+        return ("Aún no se han integrado datos reales de 2026 para este país; "
+                "la tabla recoge previsiones públicas de terceros.")
+    m = r.merge(_filtrar(fc, pais, tecnologia), on=["fecha", "pais", "tecnologia"])
+    dentro = m["precio_capturado"].between(m["capturado_inf"], m["capturado_sup"]).mean()
+    return (f"Contraste con lo real de 2026 ({len(m)} meses publicados): vertimiento real "
+            f"{m['vertimiento'].mean():.1%} frente a {m['vert_media'].mean():.1%} proyectado; precio "
+            f"capturado real {m['precio_capturado'].mean():.1f} frente a "
+            f"{m['capturado_media'].mean():.1f} USD/MWh proyectado. {dentro:.0%} de los meses "
+            "quedan dentro del intervalo del 80 %.")
+
+
+def register_callbacks(app: Dash, df: pd.DataFrame, fc: pd.DataFrame, val: pd.DataFrame,
+                       prev: pd.DataFrame, real26: pd.DataFrame) -> None:
     """Registra los callbacks sobre los datos ya cargados."""
 
     @app.callback(
@@ -58,6 +87,8 @@ def register_callbacks(app: Dash, df: pd.DataFrame, fc: pd.DataFrame, val: pd.Da
         Output("g-paridad", "figure"),
         Output("nota-modelo", "children"),
         Output("g-vertimiento", "figure"),
+        Output("contraste-2026", "children"),
+        Output("tabla-previsiones", "children"),
         Input("pais", "value"),
         Input("tecnologia", "value"),
     )
@@ -88,4 +119,6 @@ def register_callbacks(app: Dash, df: pd.DataFrame, fc: pd.DataFrame, val: pd.Da
             "Sí" if hay_paridad else "No", proy,
             fig_paridad(sel, sel_fc), _nota_modelo(val, pais, tecnologia),
             fig_vertimiento(sel, sel_fc),
+            _contraste_2026(real26, fc, pais, tecnologia),
+            _tabla_previsiones(prev, pais),
         )

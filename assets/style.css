@@ -18,3 +18,9 @@ body { margin: 0; background: #f5f7fa; color: #1c2733;
 .footer { margin-top: 24px; font-size: 12px; color: #7f8c8d; }
 .nota { font-size: 13px; color: #5a6b7d; margin: 4px 0 16px; }
 @media (max-width: 900px) { .kpis { grid-template-columns: repeat(2, 1fr); } }
+.seccion { font-size: 18px; margin: 28px 0 6px; color: #1f4e79; }
+.tabla { width: 100%; border-collapse: collapse; background: #fff; font-size: 13px;
+         box-shadow: 0 1px 3px rgba(0,0,0,.08); border-radius: 8px; overflow: hidden; }
+.tabla th { text-align: left; background: #eef2f7; padding: 8px 10px; color: #1c2733; }
+.tabla td { padding: 8px 10px; border-top: 1px solid #eef2f7; vertical-align: top; }
+.tabla a { color: #1f4e79; }
