@@ -1,0 +1,9 @@
+pais,tecnologia,variable,modelo,validado,n_test,mae,mae_ingenuo,mae_Estacional ingenuo,mae_ETS sin tendencia,mae_ETS con tendencia amortiguada
+BR,eolica,precio_capturado,Estacional ingenuo,True,12,18.8033,18.8033,18.8033,18.7198,18.6197
+BR,eolica,vertimiento,ETS sin tendencia,True,12,0.0905,0.1037,0.1037,0.0905,0.0896
+BR,solar,precio_capturado,Estacional ingenuo,False,12,,,,,
+BR,solar,vertimiento,Estacional ingenuo,False,12,,,,,
+CL,eolica,precio_capturado,ETS sin tendencia,True,12,9.7662,16.545,16.545,9.7662,11.7428
+CL,eolica,vertimiento,Estacional ingenuo,True,12,0.0204,0.0204,0.0204,0.0248,0.0198
+CL,solar,precio_capturado,Estacional ingenuo,True,12,5.5467,5.5467,5.5467,6.3113,8.6553
+CL,solar,vertimiento,Estacional ingenuo,True,12,0.0355,0.0355,0.0355,0.0398,0.067
