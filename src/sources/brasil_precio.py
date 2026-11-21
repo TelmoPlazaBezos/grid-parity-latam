@@ -5,8 +5,8 @@ automatizadas. Se reconstruye a partir del CMO semihorario del ONS (el PLD
 horario sale del mismo modelo DESSEM), acotado por el PLD mínimo y máximo
 horario regulados por ANEEL para cada año.
 
-Límites del PLD (ANEEL): 2023, 2024 y 2025 verificados en prensa sectorial
-(Canal Solar). 2022 pendiente de verificar.
+Límites del PLD (ANEEL): 2023-2026 verificados en prensa sectorial
+(Canal Solar, Cenário Energia). 2022 pendiente de verificar.
 
 Tipo de cambio: PTAX (venta) del Banco Central do Brasil, API abierta Olinda.
 """
@@ -31,6 +31,7 @@ PLD_LIMITES = {
     2023: (69.04, 1391.56),
     2024: (61.07, 1470.47),
     2025: (58.60, 1542.23),
+    2026: (57.31, 1611.04),
 }
 
 
