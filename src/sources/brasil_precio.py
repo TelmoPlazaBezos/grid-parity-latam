@@ -5,8 +5,8 @@ automatizadas. Se reconstruye a partir del CMO semihorario del ONS (el PLD
 horario sale del mismo modelo DESSEM), acotado por el PLD mínimo y máximo
 horario regulados por ANEEL para cada año.
 
-PENDIENTE DE VERIFICAR: los valores de PLD_LIMITES deben contrastarse con las
-resoluciones de ANEEL antes de la presentación.
+Límites del PLD (ANEEL): 2023, 2024 y 2025 verificados en prensa sectorial
+(Canal Solar). 2022 pendiente de verificar.
 
 Tipo de cambio: PTAX (venta) del Banco Central do Brasil, API abierta Olinda.
 """
@@ -25,11 +25,11 @@ PTAX_URL = ("https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata/"
             "?@dataInicial='{ini}'&@dataFinalCotacao='{fin}'&$format=json")
 RAW_DIR = ROOT / "data" / "raw" / "brasil"
 
-# PLD horario mínimo y máximo (R$/MWh) por año. Verificar con ANEEL.
+# PLD mínimo y máximo horario (R$/MWh) por año, fijados por ANEEL.
 PLD_LIMITES = {
-    2022: (55.70, 1326.50),
+    2022: (55.70, 1326.50),  # pendiente de verificar
     2023: (69.04, 1391.56),
-    2024: (61.07, 1470.57),
+    2024: (61.07, 1470.47),
     2025: (58.60, 1542.23),
 }
 
