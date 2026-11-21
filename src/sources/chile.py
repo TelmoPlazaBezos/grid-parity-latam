@@ -14,6 +14,7 @@ La clave `user_key` es la clave pública que usa la propia web del Coordinador.
 """
 
 import json
+from datetime import datetime
 from pathlib import Path
 from typing import Dict
 from urllib.request import urlopen
@@ -78,21 +79,87 @@ def generacion(inicio: str = "2022-01", fin: str = "2025-12") -> pd.DataFrame:
 
 
 def mensual() -> pd.DataFrame:
-    """Precio base y capturado mensual por tecnología (periodo con CMg disponible)."""
-    cmg = costo_marginal()
+    """Precio base, precio capturado y vertimiento mensual por tecnología."""
+    cmg = pd.concat([costo_marginal(), costo_marginal_descargado()], ignore_index=True)
     gen = generacion()
+    vert = vertimiento_mensual()
     partes = []
     for tec, barra in BARRA_TECNOLOGIA.items():
-        h = gen[gen["tecnologia"] == tec].merge(cmg[["hora", barra]], on="hora", how="inner")
+        # left join: los meses sin costo marginal conservan generación y vertimiento.
+        h = gen[gen["tecnologia"] == tec].merge(cmg[["hora", barra]], on="hora", how="left")
         h = h.rename(columns={barra: "precio"})
         h["mes"] = h["hora"].dt.to_period("M").dt.to_timestamp()
         h["ingreso"] = h["precio"] * h["generacion"]
+        h["gen_con_precio"] = h["generacion"].where(h["precio"].notna())
         g = h.groupby("mes").agg(generacion=("generacion", "sum"), ingreso=("ingreso", "sum"),
+                                 gen_con_precio=("gen_con_precio", "sum"),
                                  precio_base=("precio", "mean"))
+        v = vert[vert["tecnologia"] == tec].set_index("fecha")["vertido_mwh"].reindex(g.index)
         partes.append(pd.DataFrame({
             "fecha": g.index, "pais": "CL", "tecnologia": tec,
             "precio_base": g["precio_base"].values,
-            "precio_capturado": (g["ingreso"] / g["generacion"]).values,
+            "precio_capturado": (g["ingreso"] / g["gen_con_precio"].replace(0, float("nan"))).values,
+            "vertimiento": (v / (v + g["generacion"])).values,
             "generacion_mwh": g["generacion"].values,
         }))
     return pd.concat(partes, ignore_index=True)
+
+
+# --- Desde el 15/07/2024: archivos descargados a mano del visor del Coordinador ---
+# Visor: coordinador.cl > Mercados > Descarga Datos Costos Marginales > Preliminar/Real
+# Filtros: Año, Mes, Barras (Quillota/Crucero/Charrúa 220), Descargar (.xlsx, 15 min).
+# Los archivos se guardan en data/external/chile_cmg/ y sí se suben al repo.
+EXTERNAL_DIR = ROOT / "data" / "external" / "chile_cmg"
+COLUMNAS_XLSX = {"QUILLOTA": "quillota", "CRUCERO": "crucero", "CHARRUA": "charrua"}
+
+
+def costo_marginal_descargado() -> pd.DataFrame:
+    """Lee los .xlsx del visor y devuelve el costo marginal horario por barra (USD/MWh)."""
+    partes = []
+    for ruta in sorted(EXTERNAL_DIR.glob("*.xlsx")):
+        d = pd.read_excel(ruta)
+        cols = {c: n for c in d.columns for k, n in COLUMNAS_XLSX.items() if c.upper().startswith(k)}
+        d = d.rename(columns=cols)
+        # 'Hora' va de 0 a 23 y 'Minutos' de 0 a 45: se promedian los 4 cuartos de hora.
+        d["hora"] = pd.to_datetime(d["Fecha"]) + pd.to_timedelta(d["Hora"], unit="h")
+        partes.append(d.groupby("hora", as_index=False)[list(cols.values())].mean())
+    out = pd.concat(partes, ignore_index=True).drop_duplicates("hora")
+    return out[out["hora"] > pd.Timestamp(FIN_CMG_API) + pd.Timedelta(days=1)]
+
+
+# --- Vertimiento (reducciones ERV) publicado por el Coordinador ---
+# Coordinador > Operación > Documentos > Reducciones de Generación Renovable.
+# Se usa el archivo de diciembre de cada año: su hoja 'Resumen-Mensual' trae
+# los GWh reducidos de cada mes del año, por tecnología.
+REDUCCIONES_URLS = {
+    2022: "2023/01/Reducciones-de-Energia-Eolica-y-Solar-en-el-SEN_Diciembre-2022.xlsx",
+    2023: "2024/01/Reducciones-de-Energia-Eolica-y-Solar-en-el-SEN_Diciembre-2023_v2.xlsx",
+    2024: "2025/01/Reducciones-de-Energia-Eolica-y-Solar-en-el-SEN_Diciembre-24-PE-PFV_Publicar.xlsx",
+    2025: "2026/01/Reducciones-de-Energia-Eolica-Solar-Hidro-en-el-SEN_Diciembre-25-PE-PFV_Publicar.xlsx",
+}
+ETIQUETAS = {"Eólica": "eolica", "Solar": "solar"}
+
+
+def vertimiento_mensual() -> pd.DataFrame:
+    """Energía reducida (MWh) por mes y tecnología, 2022-2025."""
+    from urllib.request import urlretrieve
+
+    filas = []
+    for anio, ruta_web in REDUCCIONES_URLS.items():
+        ruta = RAW_DIR / f"reducciones_{anio}.xlsx"
+        if not ruta.exists():
+            RAW_DIR.mkdir(parents=True, exist_ok=True)
+            urlretrieve(f"https://www.coordinador.cl/wp-content/uploads/{ruta_web}", ruta)
+        d = pd.read_excel(ruta, sheet_name="Resumen-Mensual", header=None)
+        # Fila de cabecera: la que tiene fechas de inicio de mes del año.
+        fila_fechas = next(i for i in range(len(d))
+                           if isinstance(d.iat[i, 2], datetime) and d.iat[i, 2].year == anio)
+        cols = {j: pd.Timestamp(d.iat[fila_fechas, j]) for j in range(d.shape[1])
+                if isinstance(d.iat[fila_fechas, j], datetime)}
+        for i in range(fila_fechas + 1, fila_fechas + 6):
+            tec = ETIQUETAS.get(str(d.iat[i, 1]).strip())
+            if tec:
+                for j, mes in cols.items():
+                    filas.append({"fecha": mes, "tecnologia": tec,
+                                  "vertido_mwh": pd.to_numeric(d.iat[i, j], errors="coerce") * 1000})
+    return pd.DataFrame(filas)
