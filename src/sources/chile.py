@@ -78,10 +78,10 @@ def generacion(inicio: str = "2022-01", fin: str = "2025-12") -> pd.DataFrame:
         ["hora", "tecnologia", "generacion"]]
 
 
-def mensual() -> pd.DataFrame:
+def mensual(inicio: str = "2022-01", fin: str = "2025-12") -> pd.DataFrame:
     """Precio base, precio capturado y vertimiento mensual por tecnología."""
     cmg = pd.concat([costo_marginal(), costo_marginal_descargado()], ignore_index=True)
-    gen = generacion()
+    gen = generacion(inicio, fin)
     vert = vertimiento_mensual()
     partes = []
     for tec, barra in BARRA_TECNOLOGIA.items():
@@ -136,6 +136,8 @@ REDUCCIONES_URLS = {
     2023: "2024/01/Reducciones-de-Energia-Eolica-y-Solar-en-el-SEN_Diciembre-2023_v2.xlsx",
     2024: "2025/01/Reducciones-de-Energia-Eolica-y-Solar-en-el-SEN_Diciembre-24-PE-PFV_Publicar.xlsx",
     2025: "2026/01/Reducciones-de-Energia-Eolica-Solar-Hidro-en-el-SEN_Diciembre-25-PE-PFV_Publicar.xlsx",
+    # 2026 (solo para el contraste con la proyección): último mes publicado.
+    2026: "2026/11/Reducciones-de-Energia-Eolica-Solar-Hidro-en-el-SEN-Octubre-26-PE-PFV-publicar.xlsx",
 }
 ETIQUETAS = {"Eólica": "eolica", "Solar": "solar"}
 
