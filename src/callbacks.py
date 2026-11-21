@@ -72,13 +72,30 @@ def _contraste_2026(real26: pd.DataFrame, fc: pd.DataFrame, pais: str, tecnologi
             "quedan dentro del intervalo del 80 %.")
 
 
+def _titular_2026(anual_2026: pd.DataFrame, pais: str, tecnologia: str) -> str:
+    """Segunda línea del titular con lo que dicen los meses reales de 2026."""
+    if anual_2026.empty:
+        return ""
+    a = anual_2026[(anual_2026["pais"] == pais) & (anual_2026["tecnologia"] == tecnologia)]
+    if a.empty:
+        return ""
+    r = a.iloc[0]
+    estado = "mantiene la paridad" if r["margen"] > 0 else "sigue sin paridad"
+    if 0 < r["margen"] < 5:
+        estado = "queda al límite de la paridad"
+    return (f"2026 (real, {int(r['meses'])} meses): {estado}, con un margen de "
+            f"{r['margen']:+.1f} USD/MWh y un vertimiento del {r['vertimiento']:.0%}.")
+
+
 def register_callbacks(app: Dash, df: pd.DataFrame, fc: pd.DataFrame, val: pd.DataFrame,
-                       prev: pd.DataFrame, real26: pd.DataFrame) -> None:
+                       prev: pd.DataFrame, real26: pd.DataFrame,
+                       anual_hist: pd.DataFrame, anual_2026: pd.DataFrame) -> None:
     """Registra los callbacks sobre los datos ya cargados."""
 
     @app.callback(
         Output("aviso", "children"),
         Output("titular", "children"),
+        Output("titular-2026", "children"),
         Output("kpi-margen", "children"),
         Output("kpi-vert", "children"),
         Output("kpi-captura", "children"),
@@ -95,17 +112,15 @@ def register_callbacks(app: Dash, df: pd.DataFrame, fc: pd.DataFrame, val: pd.Da
     def actualizar(pais: str, tecnologia: str) -> Tuple:
         sel = _filtrar(df, pais, tecnologia)
         sel_fc = _filtrar(fc, pais, tecnologia)
-        anio = int(sel["fecha"].dt.year.max())
-        ultimo = sel[sel["fecha"].dt.year == anio]
-
-        margen = ultimo["margen"].mean()
-        vert = ultimo["vertimiento"].mean()
-        captura = ultimo["ratio_captura"].mean()
-        hay_paridad = margen > 0
+        a = _filtrar(anual_hist.rename(columns={"anio": "fecha"}), pais, tecnologia)
+        ultimo = a.iloc[-1]
+        anio = int(ultimo["fecha"])
+        hay_paridad = ultimo["margen"] > 0
 
         nombre = f"{TECNOLOGIAS[tecnologia]} en {PAISES[pais]}"
         verbo = "cubre" if hay_paridad else "no cubre"
         titular = f"{nombre}: en {anio} el precio capturado {verbo} el LCOE efectivo"
+        titular_2026 = _titular_2026(anual_2026, pais, tecnologia)
 
         if sel_fc.empty:
             proy = "–"
@@ -114,9 +129,9 @@ def register_callbacks(app: Dash, df: pd.DataFrame, fc: pd.DataFrame, val: pd.Da
             proy = f"{m28:+.1f}"
 
         return (
-            _aviso(sel), titular,
-            f"{margen:+.1f}", f"{vert:.1%}", f"{captura:.0%}",
-            "Sí" if hay_paridad else "No", proy,
+            _aviso(sel), titular, titular_2026,
+            f"{ultimo['margen']:+.1f}", f"{ultimo['vertimiento']:.1%}",
+            f"{ultimo['ratio_captura']:.0%}", "Sí" if hay_paridad else "No", proy,
             fig_paridad(sel, sel_fc), _nota_modelo(val, pais, tecnologia),
             fig_vertimiento(sel, sel_fc),
             _contraste_2026(real26, fc, pais, tecnologia),
