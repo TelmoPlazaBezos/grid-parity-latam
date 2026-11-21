@@ -108,6 +108,10 @@ python -m scripts.backtest_2026
 La app desplegada solo lee `data/processed/`, así que arranca rápido y no depende de que las
 fuentes estén disponibles.
 
+## Variables de entorno
+
+Ninguna: todas las fuentes son públicas y no hace falta ninguna clave.
+
 ## Cómo se testea
 
 ```bash
