@@ -34,8 +34,15 @@ def register_callbacks(app: Dash, df: pd.DataFrame) -> None:
         captura = ultimo["ratio_captura"].mean()
         hay_paridad = margen > 0
 
-        aviso = (html.Div("Datos de prueba sintéticos para este país: aún no son datos reales.",
-                          className="aviso") if (sel["fuente"] == "demo").any() else None)
+        faltan = int(sel["precio_capturado"].isna().sum())
+        if (sel["fuente"] == "demo").any():
+            aviso = html.Div("Datos de prueba sintéticos para este país: aún no son datos reales.",
+                             className="aviso")
+        elif faltan:
+            aviso = html.Div(f"Faltan precios de {faltan} meses: los indicadores de precio y margen "
+                             "usan solo los meses disponibles.", className="aviso")
+        else:
+            aviso = None
         anio = int(ultimo["fecha"].dt.year.max())
 
         nombre = f"{TECNOLOGIAS[tecnologia]} en {PAISES[pais]}"

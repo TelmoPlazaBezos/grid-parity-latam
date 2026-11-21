@@ -4,15 +4,15 @@ Uso (desde la raíz del repo):
     python -m scripts.build_dataset
 
 Brasil: datos reales (ONS, CMO/PLD, PTAX).
-Chile:  datos de prueba hasta integrar el Coordinador Eléctrico Nacional.
+Chile:  datos reales del Coordinador Eléctrico Nacional (API + archivos descargados).
 """
 
 import pandas as pd
 
 from src.config import MONTHLY_FILE
-from src.data import COLUMNAS, build_demo_dataset
+from src.data import COLUMNAS
 from src.lcoe import LCOE_ANUAL
-from src.sources import brasil
+from src.sources import brasil, chile
 
 
 def main() -> None:
@@ -20,8 +20,9 @@ def main() -> None:
     br["lcoe"] = br.apply(lambda r: LCOE_ANUAL[r["tecnologia"]][r["fecha"].year], axis=1)
     br["fuente"] = "real"
 
-    cl = build_demo_dataset()
-    cl = cl[cl["pais"] == "CL"]
+    cl = chile.mensual()
+    cl["lcoe"] = cl.apply(lambda r: LCOE_ANUAL[r["tecnologia"]][r["fecha"].year], axis=1)
+    cl["fuente"] = "real"
 
     out = pd.concat([br[COLUMNAS], cl[COLUMNAS]], ignore_index=True)
     out = out.sort_values(["pais", "tecnologia", "fecha"])
