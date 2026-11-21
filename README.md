@@ -51,3 +51,30 @@ Propuesta presentada el 5 de octubre de 2026. Desarrollo en curso.
 > punto de partida, no un plan cerrado. A lo largo del cuatrimestre pueden surgir
 > contratiempos con los datos o ideas nuevas que cambien el alcance, la metodología o el
 > calendario. Cualquier cambio quedará reflejado aquí.
+
+## Estructura del código
+
+```
+app.py              punto de entrada (local y Render)
+src/config.py       rutas, países, tecnologías y colores
+src/data.py         carga del dataset mensual (y, más adelante, descarga de fuentes)
+src/indicators.py   ratio de captura, LCOE efectivo y margen de paridad
+src/figures.py      gráficos Plotly
+src/layout.py       estructura de la página
+src/callbacks.py    interactividad
+assets/style.css    estilos
+data/processed/     dataset mensual consolidado que lee la app
+```
+
+## Cómo ejecutar en local
+
+```bash
+python -m venv .venv
+source .venv/bin/activate      # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+python app.py                  # http://127.0.0.1:8050
+```
+
+> Ahora mismo la app usa **datos de prueba sintéticos** (`fuente = demo`) para validar
+> la estructura y el despliegue. Se sustituirán por los datos reales de CCEE, ONS y el
+> Coordinador.
