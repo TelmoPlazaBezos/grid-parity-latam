@@ -3,6 +3,8 @@ services:
     name: grid-parity-latam
     runtime: python
     plan: free
+    autoDeploy: true
+    branch: main
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn --timeout 120 app:server
     envVars:
