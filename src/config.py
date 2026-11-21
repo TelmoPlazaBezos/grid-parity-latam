@@ -14,7 +14,7 @@ COLORES = {
     "capturado": "#1f4e79",
     "lcoe_efectivo": "#c0504d",
     "lcoe": "#e6a5a3",
-    "margen_pos": "rgba(46, 125, 50, 0.18)",
-    "margen_neg": "rgba(192, 80, 77, 0.18)",
+    "margen_pos": "rgba(46, 125, 50, 0.45)",
+    "margen_neg": "rgba(192, 80, 77, 0.30)",
     "vertimiento": "#7f8c8d",
 }

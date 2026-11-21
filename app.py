@@ -11,7 +11,7 @@ df = load_monthly()
 app = Dash(__name__, title="Grid Parity LatAm")
 server = app.server  # gunicorn lo usa en Render: `gunicorn app:server`
 
-app.layout = build_layout(es_demo=(df["fuente"] == "demo").any())
+app.layout = build_layout()
 register_callbacks(app, df)
 
 if __name__ == "__main__":
